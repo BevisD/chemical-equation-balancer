@@ -4,7 +4,7 @@ import re
 
 def get_equation_sides(raw_inp):
     raw_inp = raw_inp.replace(" ", "")
-    return re.split(r"->|=", inp)
+    return re.split(r"->|=", raw_inp)
 
 
 def get_equation_terms(side):
@@ -71,7 +71,11 @@ def get_matrix_equation(terms_1, terms_2):
 
 
 def solve_matrix_equation(matrix, vector):
-    inverse = np.linalg.inv(matrix)
+    try:
+        inverse = np.linalg.inv(matrix)
+    except np.linalg.LinAlgError:
+        print("Equation Can not be Balanced")
+        return
     coefficients = np.matmul(inverse, vector.transpose())
     coefficients = np.append(coefficients, 1)
     return coefficients
@@ -81,6 +85,8 @@ def simplify_coefficients(coefficients):
     if 0 not in coefficients:
         coefficients /= np.min(coefficients)
         coefficients = np.round(coefficients).astype(int)
+    else:
+        return
 
     return coefficients
 
@@ -90,7 +96,7 @@ def display_balanced_equation(coefficients, l_terms, r_terms):
     new_r_terms = []
     for i, term in enumerate(l_terms):
         c = coefficients[i]
-        str_c = str(abs(c)) if abs(c) not in [0, 1] else ""
+        str_c = str(abs(c)) if abs(c) != 1 else ""
 
         if c > 0:
             new_l_terms.append((str_c, term))
@@ -106,21 +112,30 @@ def display_balanced_equation(coefficients, l_terms, r_terms):
             new_l_terms.append((str_c, term))
 
     output = ' + '.join([''.join(term) for term in new_l_terms]) + \
-             "->" + \
+             " -> " + \
              ' + '.join([''.join(term) for term in new_r_terms])
     return output
 
 
-if __name__ == "__main__":
-    inp = input("Enter a Chemical Equation to Balance (Separate Sides With '=' or '->'): \n")
-
+def main():
+    # inp = input("Enter a Chemical Equation to Balance (Separate Sides With '=' or '->'): \n")
+    inp = "He + O2->2He2O"
     l_side, r_side = get_equation_sides(inp)
     l_terms = get_equation_terms(l_side)
     r_terms = get_equation_terms(r_side)
 
     matrix, vector = get_matrix_equation(l_terms, r_terms)
-
     coefficients = solve_matrix_equation(matrix, vector)
-    coefficients = simplify_coefficients(coefficients)
+    if coefficients is None:
+        return
 
-    print(display_balanced_equation(coefficients, l_terms, r_terms))
+    coefficients = simplify_coefficients(coefficients)
+    if coefficients is not None:
+        print(display_balanced_equation(coefficients, l_terms, r_terms))
+    else:
+        print("Equation Can not be Balanced")
+        return
+
+
+if __name__ == "__main__":
+    main()
