@@ -111,15 +111,16 @@ def display_balanced_equation(coefficients, l_terms, r_terms):
     return output
 
 
-inp = input("Enter a Chemical Equation to Balance (Separate Sides With '=' or '->'): \n")
+if __name__ == "__main__":
+    inp = input("Enter a Chemical Equation to Balance (Separate Sides With '=' or '->'): \n")
 
-l_side, r_side = get_equation_sides(inp)
-l_terms = get_equation_terms(l_side)
-r_terms = get_equation_terms(r_side)
+    l_side, r_side = get_equation_sides(inp)
+    l_terms = get_equation_terms(l_side)
+    r_terms = get_equation_terms(r_side)
 
-matrix, vector = get_matrix_equation(l_terms, r_terms)
+    matrix, vector = get_matrix_equation(l_terms, r_terms)
 
-coefficients = solve_matrix_equation(matrix, vector)
-coefficients = simplify_coefficients(coefficients)
+    coefficients = solve_matrix_equation(matrix, vector)
+    coefficients = simplify_coefficients(coefficients)
 
-print(display_balanced_equation(coefficients, l_terms, r_terms))
+    print(display_balanced_equation(coefficients, l_terms, r_terms))
